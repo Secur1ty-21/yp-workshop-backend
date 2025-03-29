@@ -1,0 +1,27 @@
+networks:
+  app-network:
+    driver: bridge
+services:
+  app:
+    build:
+      context: .
+    container_name: tasklist
+    networks:
+      - app-network
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/spend-analytic?currentSchema=spendanalytic
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=Krujok_228
+    ports:
+      - '8080:8080'
+  db:
+    image: postgres:15.1-alpine
+    container_name: postgres
+    networks:
+      - app-network
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Krujok_228
+      - POSTGRES_DB=tasklist

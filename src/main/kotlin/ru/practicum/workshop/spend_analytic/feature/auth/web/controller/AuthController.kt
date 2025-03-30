@@ -44,16 +44,16 @@ class AuthController(
     }
 
     @PostMapping("/recovery")
-    fun recoveryUserPassword() {
-        TODO()
+    fun recoveryUserPassword(): ResponseEntity<String> {
+        return ResponseEntity<String>("Letter send (still not work, maybe next week)", HttpStatus.OK)
     }
 
     private fun checkEmailAndPassword(email: String?, password: String?) {
         if (Validator.isEmailValid(email).not()) {
             throw ValidationException("Incorrect email")
         }
-        if (Validator.isLengthValid(password, 6).not()) {
-            throw ValidationException("Password should be more than 6 symbols")
+        if (Validator.isLengthValid(password, 8).not()) {
+            throw ValidationException("Password should be more than 7 symbols")
         }
     }
 }

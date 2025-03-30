@@ -2,9 +2,8 @@ package ru.practicum.workshop.spend_analytic.feature.auth.domain
 
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import ru.practicum.workshop.spend_analytic.feature.auth.web.exception.ValidationException
+import ru.practicum.workshop.spend_analytic.feature.auth.web.exception.UserAlreadyExistException
 import ru.practicum.workshop.spend_analytic.feature.auth.web.model.request.RegisterRequest
 import ru.practicum.workshop.spend_analytic.feature.auth.web.model.request.UserAuthRequest
 import ru.practicum.workshop.spend_analytic.feature.auth.web.model.response.RefreshTokenResponse
@@ -20,7 +19,7 @@ class AuthService(
 ) {
     fun register(registerRequest: RegisterRequest): RegisterResponse {
         if (userService.isUserEmailExist(registerRequest.email!!)) {
-            throw ValidationException("user with this email already exist")
+            throw UserAlreadyExistException("user with this email already exist")
         }
         val user = userService.createUser(registerRequest)
         authenticationManager.authenticate(

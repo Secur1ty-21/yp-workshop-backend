@@ -13,22 +13,21 @@ class UserService(
     private val passwordEncoder: PasswordEncoder
 ) {
     fun createUser(registerRequest: RegisterRequest): UserEntity {
-        val user = userRepository.createUser(UserEntity(email = registerRequest.email!!, password =  passwordEncoder.encode(registerRequest.password!!)))
-            ?: throw DatabaseException("Db error in create user")
-        return user
-    }
-
-    fun getUserById(id: Long): UserEntity {
-        val user = userRepository.getUserById(id) ?: throw DatabaseException("Db error in get user by id")
-        return user
+        val user = runCatching {
+            userRepository.save(UserEntity(email = registerRequest.email!!, password =  passwordEncoder.encode(registerRequest.password!!)))
+        }.onFailure { it.printStackTrace() }
+        return user.getOrElse { throw DatabaseException("Db error in create user") }
     }
 
     fun getUserByEmail(email: String): UserEntity {
-        val user = userRepository.getUserByEmail(email) ?: throw DatabaseException("Db error in get user by email")
+        val user = userRepository.findByEmail(email).orElseThrow {
+            DatabaseException("Db error in get user by email")
+        }
         return user
     }
 
     fun isUserEmailExist(email: String): Boolean {
-        return userRepository.getUserByEmail(email) != null
+        val user = userRepository.findByEmail(email)
+        return user.isPresent
     }
 }

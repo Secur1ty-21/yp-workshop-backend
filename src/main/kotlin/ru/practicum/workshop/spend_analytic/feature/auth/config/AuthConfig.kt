@@ -39,10 +39,10 @@ class AuthConfig(
             .exceptionHandling {
                 it.authenticationEntryPoint { _, response, _ ->
                     response.status = HttpStatus.UNAUTHORIZED.value()
-                    response.writer.write("UNAUTHORIZED")
+                    response.writer.write("Unauthorized")
                 }.accessDeniedHandler { _, response, _ ->
                     response.status = HttpStatus.FORBIDDEN.value()
-                    response.writer.write("FORBIDDEN")
+                    response.writer.write("Forbidden")
                 }
             }
             .authorizeHttpRequests {

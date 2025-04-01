@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import ru.practicum.workshop.spend_analytic.feature.auth.web.exception.AuthException
 import ru.practicum.workshop.spend_analytic.feature.auth.web.exception.DatabaseException
 import ru.practicum.workshop.spend_analytic.feature.auth.web.exception.UserAlreadyExistException
 import ru.practicum.workshop.spend_analytic.feature.auth.web.exception.ValidationException
@@ -30,6 +31,12 @@ class ErrorHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     fun handleValidationError(e: UserAlreadyExistException): ResponseEntity<String> {
         return ResponseEntity<String>(e.message, HttpStatus.CONFLICT)
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    fun handleValidationError(e: AuthException): ResponseEntity<String> {
+        return ResponseEntity<String>(e.message, HttpStatus.UNAUTHORIZED)
     }
 
     @ExceptionHandler

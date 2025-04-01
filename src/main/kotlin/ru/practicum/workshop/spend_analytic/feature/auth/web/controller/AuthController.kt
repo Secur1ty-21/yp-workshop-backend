@@ -1,12 +1,12 @@
 package ru.practicum.workshop.spend_analytic.feature.auth.web.controller
 
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import ru.practicum.workshop.spend_analytic.feature.auth.domain.AuthService
 import ru.practicum.workshop.spend_analytic.feature.auth.web.Validator
 import ru.practicum.workshop.spend_analytic.feature.auth.web.exception.ValidationException
-import ru.practicum.workshop.spend_analytic.feature.auth.web.model.request.CheckRequest
 import ru.practicum.workshop.spend_analytic.feature.auth.web.model.request.RefreshTokenRequest
 import ru.practicum.workshop.spend_analytic.feature.auth.web.model.request.RegisterRequest
 import ru.practicum.workshop.spend_analytic.feature.auth.web.model.request.UserAuthRequest
@@ -39,8 +39,12 @@ class AuthController(
     }
 
     @GetMapping("/check")
-    fun isValid(@RequestBody checkRequest: CheckRequest): CheckResponse {
-        return CheckResponse(authService.isTokenValid(checkRequest.accessToken))
+    fun isValid(@RequestHeader(HttpHeaders.AUTHORIZATION) accessToken: String): CheckResponse {
+        val token = accessToken.substringAfter(BEARER_PREFIX, missingDelimiterValue = "")
+        if (token.isEmpty()) {
+            throw ValidationException("Token or Bearer prefix not found")
+        }
+        return CheckResponse(authService.isTokenValid(token))
     }
 
     @PostMapping("/recovery")
@@ -52,8 +56,12 @@ class AuthController(
         if (Validator.isEmailValid(email).not()) {
             throw ValidationException("Incorrect email")
         }
-        if (Validator.isLengthValid(password, 8).not()) {
+        if (Validator.isLengthValid(password, 7).not()) {
             throw ValidationException("Password should be more than 7 symbols")
         }
+    }
+
+    private companion object {
+        const val BEARER_PREFIX = "Bearer "
     }
 }

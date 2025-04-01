@@ -4,6 +4,7 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.stereotype.Service
 import ru.practicum.workshop.spend_analytic.feature.auth.web.exception.UserAlreadyExistException
+import ru.practicum.workshop.spend_analytic.feature.auth.web.exception.AuthException
 import ru.practicum.workshop.spend_analytic.feature.auth.web.model.request.RegisterRequest
 import ru.practicum.workshop.spend_analytic.feature.auth.web.model.request.UserAuthRequest
 import ru.practicum.workshop.spend_analytic.feature.auth.web.model.response.RefreshTokenResponse
@@ -31,10 +32,13 @@ class AuthService(
     }
 
     fun login(userAuthRequest: UserAuthRequest): UserAuthResponse {
+        if (userService.isUserEmailExist(userAuthRequest.email!!).not()) {
+            throw AuthException("Unauthorized")
+        }
         authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(userAuthRequest.email, userAuthRequest.password)
         )
-        val user = userService.getUserByEmail(userAuthRequest.email!!)
+        val user = userService.getUserByEmail(userAuthRequest.email)
         val accessToken = jwtTokenProvider.createAccessToken(user.id, user.email)
         val refreshToken = jwtTokenProvider.createRefreshToken(user.id, user.email)
         return UserAuthResponse(userId = user.id, accessToken = accessToken, refreshToken = refreshToken)

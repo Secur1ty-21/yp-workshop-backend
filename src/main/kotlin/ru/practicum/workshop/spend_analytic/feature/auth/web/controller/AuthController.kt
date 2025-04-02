@@ -39,12 +39,13 @@ class AuthController(
     }
 
     @GetMapping("/check")
-    fun isValid(@RequestHeader(HttpHeaders.AUTHORIZATION) accessToken: String): CheckResponse {
+    fun isValid(@RequestHeader(HttpHeaders.AUTHORIZATION) accessToken: String): ResponseEntity<CheckResponse> {
         val token = accessToken.substringAfter(BEARER_PREFIX, missingDelimiterValue = "")
         if (token.isEmpty()) {
             throw ValidationException("Token or Bearer prefix not found")
         }
-        return CheckResponse(authService.isTokenValid(token))
+
+        return ResponseEntity<CheckResponse>(CheckResponse(refresh = authService.isTokenValid(token)), HttpStatus.OK)
     }
 
     @PostMapping("/recovery")

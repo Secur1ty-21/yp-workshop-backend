@@ -4,5 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 class CheckResponse(
     @JsonProperty("is_valid")
-    val isValid: Boolean
+    val refresh: Boolean,
+    @JsonProperty("success")
+    val success: Boolean = true
 )
